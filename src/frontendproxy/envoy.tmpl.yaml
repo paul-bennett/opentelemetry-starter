@@ -28,16 +28,10 @@ static_resources:
                       domains:
                         - "*"
                       routes:
-                        - match: { prefix: "/feature" }
-                          route: { cluster: featureflag, prefix_rewrite: "/" }
-                        - match: { prefix: "/loadgen" }
-                          route: { cluster: loadgen, prefix_rewrite: "/" }
                         - match: { prefix: "/jaeger" }
                           route: { cluster: jaeger }
                         - match: { prefix: "/grafana" }
                           route: { cluster: grafana }
-                        - match: { prefix: "/" }
-                          route: { cluster: frontend }
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
@@ -61,42 +55,6 @@ static_resources:
                     socket_address:
                       address: ${OTEL_COLLECTOR_HOST}
                       port_value: ${OTEL_COLLECTOR_PORT}
-    - name: frontend
-      type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
-      load_assignment:
-        cluster_name: frontend
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: ${FRONTEND_HOST}
-                      port_value: ${FRONTEND_PORT}
-    - name: featureflag
-      type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
-      load_assignment:
-        cluster_name: featureflag
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: ${FEATURE_FLAG_SERVICE_HOST}
-                      port_value: ${FEATURE_FLAG_SERVICE_PORT}
-    - name: loadgen
-      type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
-      load_assignment:
-        cluster_name: loadgen
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: ${LOCUST_WEB_HOST}
-                      port_value: ${LOCUST_WEB_PORT}
     - name: grafana
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
